@@ -4,15 +4,23 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { 
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+} from '@/components/ui/dialog';
 import { Plus, Package } from 'lucide-react';
 import { GroceryItem } from '@/types';
 
 interface GroceryFormProps {
+  isOpen: boolean;
+  onClose: () => void;
   onAddItem: (item: Omit<GroceryItem, 'id' | 'createdAt'>) => void;
 }
 
-export const GroceryForm = ({ onAddItem }: GroceryFormProps) => {
+export const GroceryForm = ({ isOpen, onClose, onAddItem }: GroceryFormProps) => {
   const [formData, setFormData] = useState({
     name: '',
     quantity: '',
@@ -33,6 +41,7 @@ export const GroceryForm = ({ onAddItem }: GroceryFormProps) => {
       daysUntilCritical: formData.priority === 'medium' ? formData.daysUntilCritical : undefined,
     });
 
+    // إعادة تعيين النموذج
     setFormData({
       name: '',
       quantity: '',
@@ -41,24 +50,27 @@ export const GroceryForm = ({ onAddItem }: GroceryFormProps) => {
     });
   };
 
-  const getPriorityLabel = (priority: string) => {
-    switch (priority) {
-      case 'high': return 'أساسي (أحمر)';
-      case 'medium': return 'كمية قليلة (أصفر)';
-      case 'low': return 'اختياري (أخضر)';
-      default: return priority;
-    }
+  const handleClose = () => {
+    // إعادة تعيين النموذج عند الإغلاق
+    setFormData({
+      name: '',
+      quantity: '',
+      priority: 'medium',
+      daysUntilCritical: 3,
+    });
+    onClose();
   };
 
   return (
-    <Card className="animate-fade-in-scale">
-      <CardHeader className="text-center">
-        <CardTitle className="flex items-center justify-center gap-2 text-2xl">
-          <Package className="h-6 w-6 text-primary" />
-          إضافة منتج جديد
-        </CardTitle>
-      </CardHeader>
-      <CardContent>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle className="flex items-center justify-center gap-2 text-xl">
+            <Package className="h-5 w-5 text-primary" />
+            إضافة منتج جديد
+          </DialogTitle>
+        </DialogHeader>
+        
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
             <Label htmlFor="name">اسم المنتج *</Label>
@@ -121,12 +133,17 @@ export const GroceryForm = ({ onAddItem }: GroceryFormProps) => {
             </div>
           )}
 
-          <Button type="submit" className="w-full" size="lg">
-            <Plus className="h-4 w-4 mr-2" />
-            إضافة إلى القائمة
-          </Button>
+          <DialogFooter className="flex gap-2 pt-4">
+            <Button type="button" variant="outline" onClick={handleClose}>
+              إلغاء
+            </Button>
+            <Button type="submit" className="flex-1">
+              <Plus className="h-4 w-4 mr-2" />
+              إضافة إلى القائمة
+            </Button>
+          </DialogFooter>
         </form>
-      </CardContent>
-    </Card>
+      </DialogContent>
+    </Dialog>
   );
 };

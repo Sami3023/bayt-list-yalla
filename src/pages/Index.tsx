@@ -3,15 +3,18 @@ import { GroceryForm } from '@/components/GroceryForm';
 import { GroceryList } from '@/components/GroceryList';
 import { useGroceryList } from '@/hooks/useGroceryList';
 import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
+import { Button } from '@/components/ui/button';
+import { useState } from 'react';
 import { 
   ShoppingBasket, 
   Sparkles, 
   Users,
-  RefreshCw
+  RefreshCw,
+  Plus
 } from 'lucide-react';
 
 const Index = () => {
+  const [isAddFormOpen, setIsAddFormOpen] = useState(false);
   const { 
     items, 
     isLoading, 
@@ -20,6 +23,11 @@ const Index = () => {
     togglePurchased, 
     deleteItem 
   } = useGroceryList();
+
+  const handleAddItem = (item: any) => {
+    addItem(item);
+    setIsAddFormOpen(false);
+  };
 
   if (isLoading) {
     return (
@@ -49,7 +57,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-yellow-50">
       {/* الترويسة */}
-      <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-50">
+      <header className="bg-white/80 backdrop-blur-sm border-b sticky top-0 z-40">
         <div className="container mx-auto px-4 py-6">
           <div className="text-center space-y-2">
             <div className="flex items-center justify-center gap-3">
@@ -78,24 +86,34 @@ const Index = () => {
 
       {/* المحتوى الرئيسي */}
       <main className="container mx-auto px-4 py-8">
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* نموذج إضافة منتج */}
-          <div className="lg:col-span-1">
-            <div className="sticky top-32">
-              <GroceryForm onAddItem={addItem} />
-            </div>
+        <div className="max-w-4xl mx-auto">
+          {/* زر إضافة منتج */}
+          <div className="mb-6 text-center">
+            <Button 
+              onClick={() => setIsAddFormOpen(true)}
+              size="lg"
+              className="w-full md:w-auto"
+            >
+              <Plus className="h-4 w-4 mr-2" />
+              إضافة منتج جديد
+            </Button>
           </div>
 
           {/* قائمة المنتجات */}
-          <div className="lg:col-span-2">
-            <GroceryList
-              items={items}
-              onTogglePurchased={togglePurchased}
-              onDeleteItem={deleteItem}
-            />
-          </div>
+          <GroceryList
+            items={items}
+            onTogglePurchased={togglePurchased}
+            onDeleteItem={deleteItem}
+          />
         </div>
       </main>
+
+      {/* نافذة إضافة المنتج */}
+      <GroceryForm 
+        isOpen={isAddFormOpen}
+        onClose={() => setIsAddFormOpen(false)}
+        onAddItem={handleAddItem}
+      />
 
       {/* التذييل */}
       <footer className="bg-white/50 border-t mt-16">
