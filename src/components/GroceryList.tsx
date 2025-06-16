@@ -61,7 +61,7 @@ export const GroceryList = ({ items, onTogglePurchased, onDeleteItem }: GroceryL
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+          <div className="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
             <div className="space-y-1">
               <div className="text-2xl font-bold">{items.length}</div>
               <div className="text-sm text-muted-foreground">إجمالي المنتجات</div>
@@ -73,6 +73,10 @@ export const GroceryList = ({ items, onTogglePurchased, onDeleteItem }: GroceryL
             <div className="space-y-1">
               <div className="text-2xl font-bold text-yellow-600">{stats.medium}</div>
               <div className="text-sm text-yellow-600">كمية قليلة</div>
+            </div>
+            <div className="space-y-1">
+              <div className="text-2xl font-bold text-blue-600">{stats.low}</div>
+              <div className="text-sm text-blue-600">اختياري</div>
             </div>
             <div className="space-y-1">
               <div className="text-2xl font-bold text-green-600">{purchasedItems.length}</div>
