@@ -1,5 +1,5 @@
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -28,6 +28,19 @@ export const LoginPage = () => {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const { login, register, isLoading } = useAuth();
   const { toast } = useToast();
+
+  // تحميل البيانات المحفوظة عند بداية التطبيق
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem('groceryApp_savedCredentials');
+    const savedRememberMe = localStorage.getItem('groceryApp_rememberCredentials');
+    
+    if (savedCredentials && savedRememberMe === 'true') {
+      const { username: savedUsername, password: savedPassword } = JSON.parse(savedCredentials);
+      setUsername(savedUsername);
+      setPassword(savedPassword);
+      setRememberMe(true);
+    }
+  }, []);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -62,7 +75,10 @@ export const LoginPage = () => {
 
       const success = await register(username, password);
       if (success) {
+        // حفظ البيانات إذا كان "تذكرني" مفعل
         if (rememberMe) {
+          localStorage.setItem('groceryApp_rememberCredentials', 'true');
+          localStorage.setItem('groceryApp_savedCredentials', JSON.stringify({ username, password }));
           localStorage.setItem('groceryApp_rememberMe', 'true');
         }
         toast({
@@ -79,8 +95,14 @@ export const LoginPage = () => {
     } else {
       const success = await login(username, password);
       if (success) {
+        // حفظ أو حذف البيانات حسب حالة "تذكرني"
         if (rememberMe) {
+          localStorage.setItem('groceryApp_rememberCredentials', 'true');
+          localStorage.setItem('groceryApp_savedCredentials', JSON.stringify({ username, password }));
           localStorage.setItem('groceryApp_rememberMe', 'true');
+        } else {
+          localStorage.removeItem('groceryApp_rememberCredentials');
+          localStorage.removeItem('groceryApp_savedCredentials');
         }
         toast({
           title: "مرحباً بك!",
@@ -93,6 +115,15 @@ export const LoginPage = () => {
           variant: "destructive"
         });
       }
+    }
+  };
+
+  // تحديث حالة "تذكرني" وحذف البيانات المحفوظة إذا تم إلغاء التفعيل
+  const handleRememberMeChange = (checked: boolean) => {
+    setRememberMe(checked);
+    if (!checked) {
+      localStorage.removeItem('groceryApp_rememberCredentials');
+      localStorage.removeItem('groceryApp_savedCredentials');
     }
   };
 
@@ -186,7 +217,7 @@ export const LoginPage = () => {
               <Checkbox
                 id="rememberMe"
                 checked={rememberMe}
-                onCheckedChange={(checked) => setRememberMe(checked as boolean)}
+                onCheckedChange={handleRememberMeChange}
               />
               <Label htmlFor="rememberMe" className="text-sm">
                 تذكرني
@@ -225,6 +256,10 @@ export const LoginPage = () => {
                 setUsername('');
                 setPassword('');
                 setConfirmPassword('');
+                setRememberMe(false);
+                // مسح البيانات المحفوظة عند التبديل بين الأوضاع
+                localStorage.removeItem('groceryApp_rememberCredentials');
+                localStorage.removeItem('groceryApp_savedCredentials');
               }}
             >
               {isRegisterMode 
