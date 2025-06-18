@@ -2,6 +2,7 @@
 import { GroceryForm } from '@/components/GroceryForm';
 import { GroceryList } from '@/components/GroceryList';
 import { useGroceryList } from '@/hooks/useGroceryList';
+import { useAuth } from '@/hooks/useAuth';
 import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useState } from 'react';
@@ -10,11 +11,13 @@ import {
   Sparkles, 
   Users,
   RefreshCw,
-  Plus
+  Plus,
+  LogOut
 } from 'lucide-react';
 
 const Index = () => {
   const [isAddFormOpen, setIsAddFormOpen] = useState(false);
+  const { user, logout } = useAuth();
   const { 
     items, 
     isLoading, 
@@ -73,12 +76,21 @@ const Index = () => {
             <div className="flex items-center justify-center gap-4 text-sm text-muted-foreground">
               <div className="flex items-center gap-1">
                 <Users className="h-4 w-4" />
-                <span>مشاركة مع العائلة</span>
+                <span>مرحباً {user?.username}</span>
               </div>
               <div className="flex items-center gap-1">
                 <RefreshCw className="h-4 w-4" />
                 <span>تحديث تلقائي</span>
               </div>
+              <Button 
+                variant="ghost" 
+                size="sm" 
+                onClick={logout}
+                className="text-red-500 hover:text-red-700 hover:bg-red-50"
+              >
+                <LogOut className="h-4 w-4 mr-1" />
+                تسجيل خروج
+              </Button>
             </div>
           </div>
         </div>
